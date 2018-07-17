@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">CHaRM</string>
+    <string name="title_activity_success">SuccessActivity</string>
+
+        <string-array name="categories">
+            <item>Paint</item>
+            <item>Hazardous Chemicals</item>
+            <item>Electronics</item>
+            <item>Styrofoam</item>
+            <item>Metal</item>
+            <item>Mattresses</item>
+            <item>Textiles</item>
+            <item>Single Stream</item>
+            <item>Glass</item>
+            <item>Cooking Grease</item>
+        </string-array>
+    </resources>
