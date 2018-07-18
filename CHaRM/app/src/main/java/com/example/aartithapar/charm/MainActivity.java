@@ -14,12 +14,30 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button submitButton;
     private EditText zipcodeText;
     private DatabaseReference mDatabase;
     private Spinner spinner;
+    private String saltStr;
+
+    protected String getSaltString() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 18) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        String saltStr = salt.toString();
+        return saltStr;
+
+    }
 
 
     @Override
@@ -39,19 +57,37 @@ public class MainActivity extends AppCompatActivity {
         submitButton = (Button) findViewById(R.id.submitButton);
         zipcodeText = (EditText) findViewById(R.id.zipcodeText);
 
+
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (zipcodeText.getText().toString().length() != 5) {
+                String zipCode = zipcodeText.getText().toString();
+                try {
+                    int num = Integer.parseInt(zipCode);
+                } catch (NumberFormatException exception) {
+                    System.out.println("Input is not a valid integer");
                     Context context = getApplicationContext();
-                    CharSequence text = "Incorrect zip code length.";
+                    CharSequence text = "Incorrect zip code format";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                    return;
+                }
+                if (zipCode.length() != 5) {
+                    Context context = getApplicationContext();
+                    CharSequence text = "Incorrect zip code length";
                     int duration = Toast.LENGTH_SHORT;
 
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
                 } else {
+                    String date = new SimpleDateFormat("MM-dd-yyyy").format(new Date());
+                    saltStr = getSaltString();
                     mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.child("zipcodes").child(zipcodeText.getText().toString()).child("items").setValue(spinner.getSelectedItem().toString());
+                    mDatabase.child(saltStr).child("Zip Code: ").setValue(zipCode);
+                    mDatabase.child(saltStr).child("Category of Item Recycled: ").setValue(spinner.getSelectedItem().toString());
+                    mDatabase.child(saltStr).child("Date: ").setValue(date);
                     Intent intent = new Intent(MainActivity.this, SuccessActivity.class);
                     startActivity(intent);
                 }
